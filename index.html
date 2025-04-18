@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Builder</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <aside class="sidebar">
+        <h2>Sections</h2>
+        <button id="add-name-btn">Add Name</button>
+        <button id="add-contact-btn">Add Contact Info</button>
+
+        <button id="add-education-btn">Add Education</button>
+        <button id="add-experience-btn">Add Experience</button>
+        <button id="add-publications-btn">Add Publications</button>
+        <button id="add-projects-btn">Add Projects</button>
+        <button id="add-technologies-btn">Add Technologies</button>
+        <div id="forms-container"></div>
+        <button id="undo-btn">Undo Last Action</button>
+
+        <button id="download-btn" style="margin-top: 20px">
+          Download as PDF
+        </button>
+      </aside>
+      <main class="preview">
+        <div id="resume-preview">
+          <header>
+            <h1 id="name">Your Name</h1>
+            <p id="contact">Location | Email | Phone | Website</p>
+          </header>
+          <section id="education-section">
+            <h2>Education</h2>
+            <div id="education-content"></div>
+          </section>
+          <section id="experience-section">
+            <h2>Experience</h2>
+            <div id="experience-content"></div>
+          </section>
+          <section id="publications-section">
+            <h2>Publications</h2>
+            <div id="publications-content"></div>
+          </section>
+          <section id="projects-section">
+            <h2>Projects</h2>
+            <div id="projects-content"></div>
+          </section>
+          <section id="technologies-section">
+            <h2>Technologies</h2>
+            <div id="technologies-content"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
