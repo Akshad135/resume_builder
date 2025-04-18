@@ -15,6 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentEntry = null;
   const actionStack = [];
 
+  function parseMarkdown(text) {
+    if (!text) return "";
+    return text
+      .replace(/~~(.*?)~~/g, "<s>$1</s>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(_|\*)(.*?)\1/g, "<em>$2</em>")
+      .replace(/__(.*?)__/g, "<u>$1</u>")
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+  }
+
   function promptInput(message) {
     return window.prompt(message) || "";
   }
@@ -52,11 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const titleEl = document.createElement("span");
     titleEl.className = "entry-title";
-    titleEl.textContent = title;
+    titleEl.innerHTML = parseMarkdown(title);
 
     const metaEl = document.createElement("span");
     metaEl.className = "entry-meta";
-    metaEl.textContent = meta;
+    metaEl.innerHTML = parseMarkdown(meta);
 
     header.appendChild(titleEl);
     header.appendChild(metaEl);
@@ -97,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const li = document.createElement("li");
-    li.textContent = text;
+    li.innerHTML = parseMarkdown(text);
     currentEntry.appendChild(li);
 
     actionStack.push(() => {
