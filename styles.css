@@ -454,6 +454,8 @@ header p {
 .exporting * {
   opacity: 1 !important;
   color: #000 !important;
+  animation: none !important;
+  transform: none !important;
 }
 
 .exporting .entry-bullets {
