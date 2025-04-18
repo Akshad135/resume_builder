@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,16 +9,21 @@
     <script src="script.js" defer></script>
   </head>
   <body>
+    <!-- Toast container for custom alerts -->
+    <div id="toast-container" class="toast-container"></div>
+
     <div class="container">
       <aside class="sidebar">
         <h2>Resume Builder</h2>
-        <button id="update-name">Update Name</button>
-        <button id="update-contact">Add Contact Info</button>
-        <button id="add-section-heading">Add Section Heading</button>
-        <button id="add-title-line">Add Title Line</button>
-        <button id="add-bullet-point">Add Bullet Point</button>
-        <button id="undo-btn">Undo Last Action</button>
-        <button id="download-btn" style="margin-top: 20px">
+        <button class="btn" id="update-name">Update Name</button>
+        <button class="btn" id="update-contact">Add Contact Info</button>
+        <button class="btn" id="add-section-heading">
+          Add Section Heading
+        </button>
+        <button class="btn" id="add-title-line">Add Title Line</button>
+        <button class="btn" id="add-bullet-point">Add Bullet Point</button>
+        <button class="btn" id="undo-btn">Undo Last Action</button>
+        <button class="btn btn-download" id="download-btn">
           Download as PDF
         </button>
 
@@ -28,7 +32,7 @@
           <ul>
             <li><code>**bold**</code> → <strong>bold</strong></li>
             <li>
-              <code>*italic*</code> or <code>_italic_</code> → <em>italic</em>
+              <code>*italic*</code> / <code>_italic_</code> → <em>italic</em>
             </li>
             <li><code>__underline__</code> → <u>underline</u></li>
             <li><code>~~strike~~</code> → <s>strike</s></li>
@@ -47,5 +51,6 @@
         </div>
       </main>
     </div>
+    <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
   </body>
 </html>
