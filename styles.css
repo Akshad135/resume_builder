@@ -99,3 +99,35 @@ header p {
 .entry-bullets li {
   margin-bottom: 5px;
 }
+
+.markdown-callout {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.markdown-callout h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: #1565c0;
+}
+
+.markdown-callout ul {
+  padding-left: 18px;
+  margin: 10px 0 0;
+}
+
+.markdown-callout li {
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.markdown-callout code {
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
