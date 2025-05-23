@@ -122,41 +122,76 @@ function updateContact() {
 }
 
 function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("p", "pt", "a4");
-  const resumeEl = document.getElementById("resume-preview");
-  const margin = 50;
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const usableWidth = pageWidth - 2 * margin;
-  document.body.classList.add("exporting");
-  requestAnimationFrame(() => {
-    html2canvas(resumeEl, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-    })
-      .then((canvas) => {
-        document.body.classList.remove("exporting");
-        const imgData = canvas.toDataURL("image/png");
-        const imgProps = doc.getImageProperties(imgData);
-        const imgWidth = usableWidth;
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const usableHeight = pageHeight - 2 * margin;
-        if (imgHeight > usableHeight) {
-          console.warn(
-            "Content might exceed PDF page height. Consider multi-page logic."
-          );
-        }
-        doc.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
-        doc.save("resume.pdf");
-      })
-      .catch((error) => {
-        console.error("Error generating PDF:", error);
-        document.body.classList.remove("exporting");
-        showToast("Failed to generate PDF. See console for details.");
-      });
-  });
+  downloadPDFViaPrint();
+}
+
+// Browser's native print functionality for perfect PDF output
+function downloadPDFViaPrint() {
+  // Store original values
+  const originalDisplay = document.querySelector('.sidebar').style.display;
+  const originalButton = document.getElementById('sidebar-toggle').style.display;
+  const originalTitle = document.title;
+  
+  // Hide sidebar and toggle button for printing
+  document.querySelector('.sidebar').style.display = 'none';
+  document.getElementById('sidebar-toggle').style.display = 'none';
+  
+  // Set completely empty title to minimize header content
+  document.title = "";
+  
+  // Add print-specific styles
+  const printStyles = document.createElement('style');
+  printStyles.innerHTML = `
+    @media print {
+      @page { 
+        margin: 0.5in; 
+        size: A4;
+      }
+      body { 
+        margin: 0; 
+        padding: 0; 
+        font-size: 12pt;
+        background: white;
+      }
+      .container { 
+        display: block; 
+        height: auto; 
+      }
+      .preview { 
+        padding: 0; 
+        margin: 0; 
+      }
+      #resume-preview {
+        max-width: none;
+        width: 100%;
+        padding: 20pt;
+      }
+      .sidebar, .sidebar-toggle, .toast-container { 
+        display: none !important; 
+      }
+      a {
+        color: #0066cc;
+        text-decoration: underline;
+      }
+    }
+  `;
+  document.head.appendChild(printStyles);
+  
+  // Show helpful instruction for clean PDF
+  showToast("💡 For clean PDF: In print dialog → 'More settings' → Turn OFF 'Headers and footers'");
+  
+  // Trigger print dialog
+  setTimeout(() => {
+    window.print();
+    
+    // Restore original styles and title after print dialog
+    setTimeout(() => {
+      document.querySelector('.sidebar').style.display = originalDisplay;
+      document.getElementById('sidebar-toggle').style.display = originalButton;
+      document.title = originalTitle;
+      document.head.removeChild(printStyles);
+    }, 1000);
+  }, 2000); // Longer delay so user can read the instruction
 }
 
 document.addEventListener("DOMContentLoaded", () => {

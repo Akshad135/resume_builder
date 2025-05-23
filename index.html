@@ -4,8 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Resume Builder</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -23,7 +21,7 @@
         <button class="btn" id="add-bullet-point">Add Bullet Point</button>
         <button class="btn" id="undo-btn">Undo Last Action</button>
         <button class="btn btn-download" id="download-btn">
-          Download as PDF
+          Print to PDF
         </button>
 
         <div class="markdown-callout">
@@ -36,6 +34,12 @@
             <li><code>__underline__</code> → <u>underline</u></li>
             <li><code>~~strike~~</code> → <s>strike</s></li>
             <li><code>[text](url)</code> → <a href="#">link</a></li>
+          </ul>
+          
+          <h3>Clean PDF Tips</h3>
+          <ul>
+            <li>Turn OFF "Headers and footers" in print settings</li>
+            <li>Select "Save as PDF" as destination</li>
           </ul>
         </div>
       </aside>

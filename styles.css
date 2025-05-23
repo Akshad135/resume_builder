@@ -448,9 +448,6 @@ header p {
     display: block;
   }
 }
-
-.exporting {
-}
 .exporting * {
   opacity: 1 !important;
   color: #000 !important;
@@ -485,4 +482,134 @@ header p {
 .exporting #resume-preview {
   width: 100% !important;
   margin: 0 auto !important;
+}
+
+.exporting #resume-preview {
+  max-width: none;
+  width: 100%;
+}
+
+/* Print styles for better PDF output */
+@media print {
+  @page {
+    margin: 0.5in;
+    size: A4;
+    
+    /* Hide browser headers and footers */
+    @top-left { content: ""; }
+    @top-center { content: ""; }
+    @top-right { content: ""; }
+    @bottom-left { content: ""; }
+    @bottom-center { content: ""; }
+    @bottom-right { content: ""; }
+  }
+  
+  /* Additional rules to hide browser chrome */
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  body { 
+    margin: 0 !important; 
+    padding: 0 !important; 
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    background: white !important;
+    color: black !important;
+  }
+  
+  .container { 
+    display: block !important; 
+    height: auto !important; 
+    flex-direction: column !important;
+  }
+  
+  .preview { 
+    padding: 0 !important; 
+    margin: 0 !important; 
+    overflow: visible !important;
+  }
+  
+  #resume-preview {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    padding: 20pt !important;
+  }
+  
+  .sidebar, 
+  .sidebar-toggle,
+  .toast-container { 
+    display: none !important; 
+  }
+  
+  header h1 {
+    font-size: 20pt !important;
+    margin-bottom: 8pt !important;
+    color: black !important;
+  }
+  
+  header p {
+    font-size: 10pt !important;
+    margin-bottom: 12pt !important;
+    color: #333 !important;
+  }
+  
+  .resume-section h2 {
+    font-size: 14pt !important;
+    margin-top: 16pt !important;
+    margin-bottom: 8pt !important;
+    page-break-after: avoid !important;
+    color: black !important;
+    border-bottom: 2px solid black !important;
+  }
+  
+  .entry {
+    page-break-inside: avoid !important;
+    margin-bottom: 10pt !important;
+  }
+  
+  .entry-header {
+    font-weight: bold !important;
+    margin-bottom: 4pt !important;
+    color: black !important;
+  }
+  
+  .entry-meta {
+    color: #333 !important;
+  }
+  
+  .entry-bullets {
+    margin-top: 4pt !important;
+    padding-left: 15pt !important;
+  }
+  
+  .entry-bullets li {
+    margin-bottom: 3pt !important;
+    font-size: 10pt !important;
+    color: black !important;
+  }
+  
+  a {
+    color: #0066cc !important;
+    text-decoration: underline !important;
+  }
+  
+  /* Ensure hyperlinks work in PDF */
+  a[href^="http"]:after {
+    content: none !important;
+  }
+  
+  /* Better page breaks */
+  .resume-section {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Hide any browser-generated headers/footers */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 }
