@@ -15,7 +15,6 @@
     <div id="toast-container" class="toast-container"></div>
 
     <div class="container">
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <div class="sidebar-header">
           <i
@@ -40,6 +39,20 @@
           <button class="btn btn-secondary" id="save-btn">
             <i class="ph ph-floppy-disk"></i> Save Progress
           </button>
+
+          <button class="btn" id="export-btn">
+            <i class="ph ph-export"></i> Export JSON
+          </button>
+          <button class="btn" id="import-btn">
+            <i class="ph ph-upload-simple"></i> Import JSON
+          </button>
+          <input
+            type="file"
+            id="import-input"
+            accept=".json"
+            style="display: none"
+          />
+
           <button class="btn btn-danger-soft" id="clear-btn">
             <i class="ph ph-trash"></i> Reset All
           </button>
@@ -114,7 +127,6 @@
       </div>
     </div>
 
-    <!-- Mobile sidebar toggle -->
     <button id="sidebar-toggle" class="sidebar-toggle">
       <i class="ph ph-list"></i>
     </button>

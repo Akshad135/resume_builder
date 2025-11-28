@@ -44,6 +44,8 @@ function render() {
   resumeData.sections.forEach((section, secIdx) => {
     const sectionEl = document.createElement("div");
     sectionEl.className = "resume-section";
+
+    // Helpers for Section Reordering
     const isFirstSec = secIdx === 0;
     const isLastSec = secIdx === resumeData.sections.length - 1;
 
@@ -72,6 +74,8 @@ function render() {
     section.entries.forEach((entry, entryIdx) => {
       const entryEl = document.createElement("div");
       entryEl.className = "entry";
+
+      // Helpers for Entry Reordering
       const isFirstEntry = entryIdx === 0;
       const isLastEntry = entryIdx === section.entries.length - 1;
 
@@ -105,6 +109,7 @@ function render() {
         const ul = document.createElement("ul");
         ul.className = "entry-bullets";
         entry.bullets.forEach((bullet, bulletIdx) => {
+          // Helpers for Bullet Reordering
           const isFirstBullet = bulletIdx === 0;
           const isLastBullet = bulletIdx === entry.bullets.length - 1;
 
@@ -139,11 +144,62 @@ function render() {
   saveData();
 }
 
+// --- IMPORT / EXPORT LOGIC ---
+
+function exportJSON() {
+  const dataStr = JSON.stringify(resumeData, null, 2);
+  const dataUri =
+    "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+  const exportFileDefaultName = "my-resume.json";
+
+  const linkElement = document.createElement("a");
+  linkElement.setAttribute("href", dataUri);
+  linkElement.setAttribute("download", exportFileDefaultName);
+  linkElement.click();
+  showToast("Resume exported successfully");
+}
+
+function triggerImport() {
+  document.getElementById("import-input").click();
+}
+
+function handleFileImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+
+      // Basic validation
+      if (!importedData.header || !importedData.sections) {
+        throw new Error("Invalid resume JSON format");
+      }
+
+      resumeData = importedData;
+      saveData();
+      render();
+      showToast("Resume imported successfully");
+
+      // Clear input so same file can be selected again if needed
+      event.target.value = "";
+    } catch (err) {
+      alert("Error parsing JSON: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
 // --- REORDERING LOGIC ---
 window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
+  // direction: -1 for UP, 1 for DOWN
+
   if (type === "section") {
     const newIdx = secIdx + direction;
     if (newIdx >= 0 && newIdx < resumeData.sections.length) {
+      // Swap sections
       [resumeData.sections[secIdx], resumeData.sections[newIdx]] = [
         resumeData.sections[newIdx],
         resumeData.sections[secIdx],
@@ -153,6 +209,7 @@ window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
     const entries = resumeData.sections[secIdx].entries;
     const newIdx = entryIdx + direction;
     if (newIdx >= 0 && newIdx < entries.length) {
+      // Swap entries
       [entries[entryIdx], entries[newIdx]] = [
         entries[newIdx],
         entries[entryIdx],
@@ -162,6 +219,7 @@ window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
     const bullets = resumeData.sections[secIdx].entries[entryIdx].bullets;
     const newIdx = bulletIdx + direction;
     if (newIdx >= 0 && newIdx < bullets.length) {
+      // Swap bullets
       [bullets[bulletIdx], bullets[newIdx]] = [
         bullets[newIdx],
         bullets[bulletIdx],
@@ -354,6 +412,15 @@ document.addEventListener("DOMContentLoaded", () => {
     saveData();
     showToast("Progress saved");
   });
+
+  // Export / Import Listeners
+  document.getElementById("export-btn").addEventListener("click", exportJSON);
+  document
+    .getElementById("import-btn")
+    .addEventListener("click", triggerImport);
+  document
+    .getElementById("import-input")
+    .addEventListener("change", handleFileImport);
 
   document.getElementById("clear-btn").addEventListener("click", () => {
     openConfirmModal(
