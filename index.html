@@ -16,6 +16,7 @@
 
     <div class="container">
       <aside class="sidebar">
+        <!-- GROUP 1: STRUCTURE -->
         <div class="control-group">
           <label class="group-label">Structure</label>
           <button class="btn" id="btn-edit-header">
@@ -26,6 +27,80 @@
           </button>
         </div>
 
+        <!-- GROUP 2: APPEARANCE (NEW) -->
+        <div class="control-group">
+          <label class="group-label">Appearance</label>
+
+          <!-- Density Dropdown -->
+          <div style="position: relative">
+            <select
+              id="density-select"
+              style="
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                background: white;
+                color: var(--text-main);
+                font-size: 0.9rem;
+                cursor: pointer;
+                appearance: none;
+                -webkit-appearance: none;
+              "
+            >
+              <option value="standard">Standard Density</option>
+              <option value="compact">Compact Density</option>
+              <option value="comfortable">Comfortable Density</option>
+            </select>
+            <i
+              class="ph ph-caret-down"
+              style="
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                pointer-events: none;
+                color: var(--text-muted);
+              "
+            ></i>
+          </div>
+
+          <!-- Font Dropdown -->
+          <div style="position: relative">
+            <select
+              id="font-select"
+              style="
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                background: white;
+                color: var(--text-main);
+                font-size: 0.9rem;
+                cursor: pointer;
+                appearance: none;
+                -webkit-appearance: none;
+              "
+            >
+              <option value="sans">Sans Serif (Default)</option>
+              <option value="serif">Serif (Traditional)</option>
+              <option value="mono">Monospace (Technical)</option>
+            </select>
+            <i
+              class="ph ph-text-t"
+              style="
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                pointer-events: none;
+                color: var(--text-muted);
+              "
+            ></i>
+          </div>
+        </div>
+
+        <!-- GROUP 3: ACTIONS -->
         <div class="control-group spacer">
           <label class="group-label">Actions</label>
           <button class="btn btn-secondary" id="save-btn">

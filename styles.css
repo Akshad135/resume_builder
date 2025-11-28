@@ -1,4 +1,5 @@
 :root {
+  /* --- COLORS --- */
   --primary: #4f46e5;
   --primary-hover: #4338ca;
   --bg-sidebar: #ffffff;
@@ -16,6 +17,16 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --radius: 8px;
+
+  /* --- LAYOUT & TYPOGRAPHY VARIABLES (The Knobs) --- */
+  --spacing-section: 24px; /* Gap between Experience, Education, etc. */
+  --spacing-entry: 16px; /* Gap between individual jobs */
+  --spacing-line: 1.4; /* Line height for bullet points */
+  --font-size-body: 10pt; /* Base font size for resume content */
+  --font-size-header: 28pt; /* Name size */
+
+  /* Default Font Stack */
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -23,8 +34,10 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  /* UPDATED: Uses variable for font switching */
+  font-family: var(--font-body);
   background: var(--bg-preview);
   color: var(--text-main);
   height: 100vh;
@@ -186,6 +199,9 @@ body {
   box-shadow: var(--shadow-lg);
   position: relative;
 
+  /* Ensure the font variable applies inside the preview */
+  font-family: var(--font-body);
+
   /* --- PAGE BREAK VISUAL GUIDE --- */
   background-image: radial-gradient(
     circle at center bottom,
@@ -223,19 +239,22 @@ header:hover {
 }
 
 header h1 {
-  font-size: 28pt;
+  /* UPDATED: Uses variable for name size */
+  font-size: var(--font-size-header);
   margin-bottom: 8px;
   text-transform: uppercase;
   color: #111;
   line-height: 1;
 }
 header p {
-  font-size: 10pt;
+  /* UPDATED: Uses variable for body size */
+  font-size: var(--font-size-body);
   color: #444;
 }
 
 .resume-section {
-  margin-bottom: 24px;
+  /* UPDATED: Uses variable for spacing */
+  margin-bottom: var(--spacing-section);
   position: relative;
   break-inside: avoid;
   page-break-inside: avoid;
@@ -253,7 +272,8 @@ header p {
 }
 
 .entry {
-  margin-bottom: 16px;
+  /* UPDATED: Uses variable for spacing */
+  margin-bottom: var(--spacing-entry);
   position: relative;
   padding: 4px 8px;
   border-radius: 4px;
@@ -308,7 +328,8 @@ header p {
 }
 
 .entry-meta {
-  font-size: 10pt;
+  /* UPDATED: Uses variable for body size */
+  font-size: var(--font-size-body);
   color: #555;
   font-style: italic;
   text-align: right;
@@ -324,8 +345,10 @@ header p {
   padding-left: 18px;
 }
 .entry-bullets li {
-  font-size: 10pt;
-  line-height: 1.4;
+  /* UPDATED: Uses variables for font size and line height */
+  font-size: var(--font-size-body);
+  line-height: var(--spacing-line);
+
   margin-bottom: 3px;
   position: relative;
   padding: 2px 4px;
@@ -678,4 +701,38 @@ header:hover .action-btn-group,
   a[href]:after {
     content: none !important;
   }
+}
+
+/* =========================================
+   CUSTOMIZATION THEMES (Added New)
+   ========================================= */
+
+/* --- DENSITY PRESETS --- */
+
+/* Compact Mode: Tighter spacing for cramming content */
+.density-compact {
+  --spacing-section: 12px;
+  --spacing-entry: 6px;
+  --spacing-line: 1.2;
+  --font-size-body: 9pt;
+  --font-size-header: 22pt;
+}
+
+/* Comfortable Mode: Looser spacing (Pro look) */
+.density-comfortable {
+  --spacing-section: 32px;
+  --spacing-entry: 20px;
+  --spacing-line: 1.6;
+}
+
+/* --- FONT PRESETS --- */
+
+/* Serif Mode: Academic/Traditional */
+.font-serif {
+  --font-body: "Merriweather", "Georgia", "Times New Roman", serif;
+}
+
+/* Mono Mode: Developer/Technical */
+.font-mono {
+  --font-body: "Roboto Mono", "Courier New", monospace;
 }

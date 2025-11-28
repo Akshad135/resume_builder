@@ -1,4 +1,9 @@
 const defaultState = {
+  // NEW: Settings for customization
+  settings: {
+    density: "standard", // standard, compact, comfortable
+    font: "sans", // sans, serif, mono
+  },
   header: {
     name: "Akshad Agrawal",
     contact: "San Francisco, CA | akshad.contact@gmail.com | (555) 123-4567",
@@ -34,9 +39,16 @@ let editingContext = null;
 let confirmCallback = null;
 
 // --- MIGRATION UTILITY ---
-// Converts old string bullets to objects and ensures 'hidden' property exists
 function migrateData() {
+  // 1. Ensure basic structure
   if (!resumeData.sections) return;
+
+  // 2. NEW: Ensure settings object exists (for old save files)
+  if (!resumeData.settings) {
+    resumeData.settings = { ...defaultState.settings };
+  }
+
+  // 3. Migrate content structure
   resumeData.sections.forEach((section) => {
     if (section.hidden === undefined) section.hidden = false;
     section.entries.forEach((entry) => {
@@ -55,6 +67,31 @@ function migrateData() {
     });
   });
   saveData();
+}
+
+// --- NEW: APPEARANCE LOGIC ---
+function applySettings() {
+  const preview = document.getElementById("resume-preview");
+  const densitySelect = document.getElementById("density-select");
+  const fontSelect = document.getElementById("font-select");
+
+  // 1. Sync Dropdowns with Data (Initial Load)
+  if (densitySelect) densitySelect.value = resumeData.settings.density;
+  if (fontSelect) fontSelect.value = resumeData.settings.font;
+
+  // 2. Reset Classes
+  preview.classList.remove(
+    "density-standard",
+    "density-compact",
+    "density-comfortable",
+    "font-sans",
+    "font-serif",
+    "font-mono"
+  );
+
+  // 3. Apply New Classes
+  preview.classList.add(`density-${resumeData.settings.density}`);
+  preview.classList.add(`font-${resumeData.settings.font}`);
 }
 
 function render() {
@@ -228,6 +265,10 @@ function render() {
   table.appendChild(tbody);
 
   preview.appendChild(table);
+
+  // Re-apply settings after render
+  applySettings();
+
   saveData();
 }
 
@@ -254,11 +295,12 @@ function handleFileImport(event) {
   reader.onload = function (e) {
     try {
       const importedData = JSON.parse(e.target.result);
+      // Basic validation
       if (!importedData.header || !importedData.sections) {
         throw new Error("Invalid resume JSON format");
       }
       resumeData = importedData;
-      migrateData(); // Migrate imported data
+      migrateData(); // Migrate imported data (adds settings if missing)
       saveData();
       render();
       showToast("Resume imported successfully");
@@ -502,6 +544,26 @@ document.addEventListener("DOMContentLoaded", () => {
   migrateData(); // Ensure migration runs on first load
   render();
 
+  // --- NEW: LISTENERS FOR DROPDOWNS ---
+  const densitySelect = document.getElementById("density-select");
+  const fontSelect = document.getElementById("font-select");
+
+  if (densitySelect) {
+    densitySelect.addEventListener("change", (e) => {
+      resumeData.settings.density = e.target.value;
+      saveData();
+      applySettings();
+    });
+  }
+
+  if (fontSelect) {
+    fontSelect.addEventListener("change", (e) => {
+      resumeData.settings.font = e.target.value;
+      saveData();
+      applySettings();
+    });
+  }
+
   document
     .getElementById("btn-edit-header")
     .addEventListener("click", () => openModal("header"));
@@ -543,7 +605,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "Are you sure you want to clear all data? This cannot be undone.",
       () => {
         resumeData = JSON.parse(JSON.stringify(defaultState));
-        // Reset defaultState structure check just in case
         migrateData();
         render();
         showToast("All data reset");
