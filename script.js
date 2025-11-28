@@ -28,6 +28,7 @@ function render() {
   const preview = document.getElementById("resume-preview");
   preview.innerHTML = "";
 
+  // --- HEADER ---
   const header = document.createElement("header");
   header.onclick = () => openModal("header");
   header.innerHTML = `
@@ -39,14 +40,27 @@ function render() {
   `;
   preview.appendChild(header);
 
+  // --- SECTIONS ---
   resumeData.sections.forEach((section, secIdx) => {
     const sectionEl = document.createElement("div");
     sectionEl.className = "resume-section";
+    const isFirstSec = secIdx === 0;
+    const isLastSec = secIdx === resumeData.sections.length - 1;
 
     const h2 = document.createElement("h2");
     h2.innerHTML = `
       ${parseMarkdown(section.title)}
       <div class="action-btn-group">
+        ${
+          !isFirstSec
+            ? `<button class="action-btn" title="Move Up" onclick="event.stopPropagation(); moveItem('section', -1, ${secIdx})"><i class="ph ph-arrow-up"></i></button>`
+            : ""
+        }
+        ${
+          !isLastSec
+            ? `<button class="action-btn" title="Move Down" onclick="event.stopPropagation(); moveItem('section', 1, ${secIdx})"><i class="ph ph-arrow-down"></i></button>`
+            : ""
+        }
         <button class="action-btn" title="Edit Section" onclick="event.stopPropagation(); openModal('section', ${secIdx})"><i class="ph ph-pencil-simple"></i></button>
         <button class="action-btn add-btn" title="Add Entry" onclick="event.stopPropagation(); openModal('new-entry', ${secIdx})"><i class="ph ph-plus"></i></button>
         <button class="action-btn delete-btn" title="Delete Section" onclick="event.stopPropagation(); deleteItem('section', ${secIdx})"><i class="ph ph-trash"></i></button>
@@ -54,9 +68,12 @@ function render() {
     `;
     sectionEl.appendChild(h2);
 
+    // --- ENTRIES ---
     section.entries.forEach((entry, entryIdx) => {
       const entryEl = document.createElement("div");
       entryEl.className = "entry";
+      const isFirstEntry = entryIdx === 0;
+      const isLastEntry = entryIdx === section.entries.length - 1;
 
       const entryHeader = document.createElement("div");
       entryHeader.className = "entry-header";
@@ -66,6 +83,16 @@ function render() {
             <div class="entry-meta">${parseMarkdown(entry.meta)}</div>
         </div>
         <div class="action-btn-group">
+          ${
+            !isFirstEntry
+              ? `<button class="action-btn" title="Move Up" onclick="event.stopPropagation(); moveItem('entry', -1, ${secIdx}, ${entryIdx})"><i class="ph ph-arrow-up"></i></button>`
+              : ""
+          }
+          ${
+            !isLastEntry
+              ? `<button class="action-btn" title="Move Down" onclick="event.stopPropagation(); moveItem('entry', 1, ${secIdx}, ${entryIdx})"><i class="ph ph-arrow-down"></i></button>`
+              : ""
+          }
           <button class="action-btn" title="Edit Entry" onclick="event.stopPropagation(); openModal('entry', ${secIdx}, ${entryIdx})"><i class="ph ph-pencil-simple"></i></button>
           <button class="action-btn add-btn" title="Add Bullet" onclick="event.stopPropagation(); openModal('new-bullet', ${secIdx}, ${entryIdx})"><i class="ph ph-list-plus"></i></button>
           <button class="action-btn delete-btn" title="Delete Entry" onclick="event.stopPropagation(); deleteItem('entry', ${secIdx}, ${entryIdx})"><i class="ph ph-trash"></i></button>
@@ -73,14 +100,28 @@ function render() {
       `;
       entryEl.appendChild(entryHeader);
 
+      // --- BULLETS ---
       if (entry.bullets.length > 0) {
         const ul = document.createElement("ul");
         ul.className = "entry-bullets";
         entry.bullets.forEach((bullet, bulletIdx) => {
+          const isFirstBullet = bulletIdx === 0;
+          const isLastBullet = bulletIdx === entry.bullets.length - 1;
+
           const li = document.createElement("li");
           li.innerHTML = `
             ${parseMarkdown(bullet)}
             <div class="action-btn-group">
+              ${
+                !isFirstBullet
+                  ? `<button class="action-btn" title="Move Up" onclick="event.stopPropagation(); moveItem('bullet', -1, ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-arrow-up"></i></button>`
+                  : ""
+              }
+              ${
+                !isLastBullet
+                  ? `<button class="action-btn" title="Move Down" onclick="event.stopPropagation(); moveItem('bullet', 1, ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-arrow-down"></i></button>`
+                  : ""
+              }
               <button class="action-btn" title="Edit Bullet" onclick="event.stopPropagation(); openModal('bullet', ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-pencil-simple"></i></button>
               <button class="action-btn delete-btn" title="Delete Bullet" onclick="event.stopPropagation(); deleteItem('bullet', ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-trash"></i></button>
             </div>
@@ -97,6 +138,40 @@ function render() {
 
   saveData();
 }
+
+// --- REORDERING LOGIC ---
+window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
+  if (type === "section") {
+    const newIdx = secIdx + direction;
+    if (newIdx >= 0 && newIdx < resumeData.sections.length) {
+      [resumeData.sections[secIdx], resumeData.sections[newIdx]] = [
+        resumeData.sections[newIdx],
+        resumeData.sections[secIdx],
+      ];
+    }
+  } else if (type === "entry") {
+    const entries = resumeData.sections[secIdx].entries;
+    const newIdx = entryIdx + direction;
+    if (newIdx >= 0 && newIdx < entries.length) {
+      [entries[entryIdx], entries[newIdx]] = [
+        entries[newIdx],
+        entries[entryIdx],
+      ];
+    }
+  } else if (type === "bullet") {
+    const bullets = resumeData.sections[secIdx].entries[entryIdx].bullets;
+    const newIdx = bulletIdx + direction;
+    if (newIdx >= 0 && newIdx < bullets.length) {
+      [bullets[bulletIdx], bullets[newIdx]] = [
+        bullets[newIdx],
+        bullets[bulletIdx],
+      ];
+    }
+  }
+
+  render();
+  saveData();
+};
 
 window.openModal = function (type, secIdx, entryIdx, bulletIdx) {
   const modal = document.getElementById("universal-modal");
