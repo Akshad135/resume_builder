@@ -6,14 +6,19 @@ const defaultState = {
   sections: [
     {
       title: "Experience",
+      hidden: false,
       entries: [
         {
           title: "Senior Software Engineer",
           meta: "Google | 2020 - Present",
-          stacked: false, // Default to inline
+          stacked: false,
+          hidden: false,
           bullets: [
-            "Led the **frontend overhaul** using React",
-            "Improved performance by 40%",
+            {
+              text: "Led the **frontend overhaul** using React",
+              hidden: false,
+            },
+            { text: "Improved performance by 40%", hidden: false },
           ],
         },
       ],
@@ -21,50 +26,76 @@ const defaultState = {
   ],
 };
 
+// Initialize Data
 let resumeData = JSON.parse(localStorage.getItem("resumeData")) || defaultState;
+migrateData(); // Ensure data structure is up to date
+
 let editingContext = null;
 let confirmCallback = null;
+
+// --- MIGRATION UTILITY ---
+// Converts old string bullets to objects and ensures 'hidden' property exists
+function migrateData() {
+  if (!resumeData.sections) return;
+  resumeData.sections.forEach((section) => {
+    if (section.hidden === undefined) section.hidden = false;
+    section.entries.forEach((entry) => {
+      if (entry.hidden === undefined) entry.hidden = false;
+
+      // Convert string bullets to objects
+      if (entry.bullets && entry.bullets.length > 0) {
+        entry.bullets = entry.bullets.map((b) => {
+          if (typeof b === "string") {
+            return { text: b, hidden: false };
+          }
+          if (b.hidden === undefined) b.hidden = false;
+          return b;
+        });
+      }
+    });
+  });
+  saveData();
+}
 
 function render() {
   const preview = document.getElementById("resume-preview");
   preview.innerHTML = "";
 
   // --- CREATE TABLE WRAPPER FOR PRINT LAYOUT ---
-  // This table ensures that the top margin (thead) repeats on every page
   const table = document.createElement("table");
   table.className = "resume-table";
   table.style.width = "100%";
   table.style.borderCollapse = "collapse";
 
-  // 1. THEAD: Acts as the Top Margin on EVERY page
+  // 1. THEAD
   const thead = document.createElement("thead");
   const trHead = document.createElement("tr");
   const tdHead = document.createElement("td");
   const headerSpacer = document.createElement("div");
-  headerSpacer.className = "print-header-space"; // CSS defined height
+  headerSpacer.className = "print-header-space";
   tdHead.appendChild(headerSpacer);
   trHead.appendChild(tdHead);
   thead.appendChild(trHead);
   table.appendChild(thead);
 
-  // 2. TFOOT: Acts as the Bottom Margin on EVERY page
+  // 2. TFOOT
   const tfoot = document.createElement("tfoot");
   const trFoot = document.createElement("tr");
   const tdFoot = document.createElement("td");
   const footerSpacer = document.createElement("div");
-  footerSpacer.className = "print-footer-space"; // CSS defined height
+  footerSpacer.className = "print-footer-space";
   tdFoot.appendChild(footerSpacer);
   trFoot.appendChild(tdFoot);
   tfoot.appendChild(trFoot);
   table.appendChild(tfoot);
 
-  // 3. TBODY: The actual Resume Content
+  // 3. TBODY
   const tbody = document.createElement("tbody");
   const trBody = document.createElement("tr");
   const tdBody = document.createElement("td");
   tdBody.className = "resume-content-cell";
 
-  // --- GENERATE RESUME CONTENT INTO TBODY ---
+  // --- GENERATE RESUME CONTENT ---
 
   // Header
   const header = document.createElement("header");
@@ -81,10 +112,14 @@ function render() {
   // Sections
   resumeData.sections.forEach((section, secIdx) => {
     const sectionEl = document.createElement("div");
-    sectionEl.className = "resume-section";
+    sectionEl.className = `resume-section ${section.hidden ? "is-hidden" : ""}`;
 
     const isFirstSec = secIdx === 0;
     const isLastSec = secIdx === resumeData.sections.length - 1;
+
+    // Toggle Icon Logic
+    const toggleIcon = section.hidden ? "ph-eye" : "ph-eye-slash";
+    const toggleTitle = section.hidden ? "Show Section" : "Hide Section";
 
     const h2 = document.createElement("h2");
     h2.innerHTML = `
@@ -100,6 +135,7 @@ function render() {
             ? `<button class="action-btn" title="Move Down" onclick="event.stopPropagation(); moveItem('section', 1, ${secIdx})"><i class="ph ph-arrow-down"></i></button>`
             : ""
         }
+        <button class="action-btn" title="${toggleTitle}" onclick="event.stopPropagation(); toggleItem('section', ${secIdx})"><i class="ph ${toggleIcon}"></i></button>
         <button class="action-btn" title="Edit Section" onclick="event.stopPropagation(); openModal('section', ${secIdx})"><i class="ph ph-pencil-simple"></i></button>
         <button class="action-btn add-btn" title="Add Entry" onclick="event.stopPropagation(); openModal('new-entry', ${secIdx})"><i class="ph ph-plus"></i></button>
         <button class="action-btn delete-btn" title="Delete Section" onclick="event.stopPropagation(); deleteItem('section', ${secIdx})"><i class="ph ph-trash"></i></button>
@@ -109,11 +145,14 @@ function render() {
 
     section.entries.forEach((entry, entryIdx) => {
       const entryEl = document.createElement("div");
-      entryEl.className = "entry";
+      entryEl.className = `entry ${entry.hidden ? "is-hidden" : ""}`;
 
       const isFirstEntry = entryIdx === 0;
       const isLastEntry = entryIdx === section.entries.length - 1;
       const isStacked = entry.stacked === true;
+
+      const entryToggleIcon = entry.hidden ? "ph-eye" : "ph-eye-slash";
+      const entryToggleTitle = entry.hidden ? "Show Entry" : "Hide Entry";
 
       const entryHeader = document.createElement("div");
       entryHeader.className = `entry-header ${isStacked ? "stacked" : ""}`;
@@ -133,6 +172,7 @@ function render() {
               ? `<button class="action-btn" title="Move Down" onclick="event.stopPropagation(); moveItem('entry', 1, ${secIdx}, ${entryIdx})"><i class="ph ph-arrow-down"></i></button>`
               : ""
           }
+          <button class="action-btn" title="${entryToggleTitle}" onclick="event.stopPropagation(); toggleItem('entry', ${secIdx}, ${entryIdx})"><i class="ph ${entryToggleIcon}"></i></button>
           <button class="action-btn" title="Edit Entry" onclick="event.stopPropagation(); openModal('entry', ${secIdx}, ${entryIdx})"><i class="ph ph-pencil-simple"></i></button>
           <button class="action-btn add-btn" title="Add Bullet" onclick="event.stopPropagation(); openModal('new-bullet', ${secIdx}, ${entryIdx})"><i class="ph ph-list-plus"></i></button>
           <button class="action-btn delete-btn" title="Delete Entry" onclick="event.stopPropagation(); deleteItem('entry', ${secIdx}, ${entryIdx})"><i class="ph ph-trash"></i></button>
@@ -140,16 +180,23 @@ function render() {
       `;
       entryEl.appendChild(entryHeader);
 
-      if (entry.bullets.length > 0) {
+      if (entry.bullets && entry.bullets.length > 0) {
         const ul = document.createElement("ul");
         ul.className = "entry-bullets";
-        entry.bullets.forEach((bullet, bulletIdx) => {
+        entry.bullets.forEach((bulletObj, bulletIdx) => {
           const isFirstBullet = bulletIdx === 0;
           const isLastBullet = bulletIdx === entry.bullets.length - 1;
 
+          const bulletToggleIcon = bulletObj.hidden ? "ph-eye" : "ph-eye-slash";
+          const bulletToggleTitle = bulletObj.hidden
+            ? "Show Bullet"
+            : "Hide Bullet";
+
           const li = document.createElement("li");
+          if (bulletObj.hidden) li.classList.add("is-hidden");
+
           li.innerHTML = `
-            ${parseMarkdown(bullet)}
+            ${parseMarkdown(bulletObj.text)}
             <div class="action-btn-group">
               ${
                 !isFirstBullet
@@ -161,6 +208,7 @@ function render() {
                   ? `<button class="action-btn" title="Move Down" onclick="event.stopPropagation(); moveItem('bullet', 1, ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-arrow-down"></i></button>`
                   : ""
               }
+              <button class="action-btn" title="${bulletToggleTitle}" onclick="event.stopPropagation(); toggleItem('bullet', ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ${bulletToggleIcon}"></i></button>
               <button class="action-btn" title="Edit Bullet" onclick="event.stopPropagation(); openModal('bullet', ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-pencil-simple"></i></button>
               <button class="action-btn delete-btn" title="Delete Bullet" onclick="event.stopPropagation(); deleteItem('bullet', ${secIdx}, ${entryIdx}, ${bulletIdx})"><i class="ph ph-trash"></i></button>
             </div>
@@ -210,6 +258,7 @@ function handleFileImport(event) {
         throw new Error("Invalid resume JSON format");
       }
       resumeData = importedData;
+      migrateData(); // Migrate imported data
       saveData();
       render();
       showToast("Resume imported successfully");
@@ -220,6 +269,23 @@ function handleFileImport(event) {
   };
   reader.readAsText(file);
 }
+
+// --- ITEM MANIPULATION FUNCTIONS ---
+
+window.toggleItem = function (type, secIdx, entryIdx, bulletIdx) {
+  if (type === "section") {
+    resumeData.sections[secIdx].hidden = !resumeData.sections[secIdx].hidden;
+  } else if (type === "entry") {
+    const entry = resumeData.sections[secIdx].entries[entryIdx];
+    entry.hidden = !entry.hidden;
+  } else if (type === "bullet") {
+    const bullet =
+      resumeData.sections[secIdx].entries[entryIdx].bullets[bulletIdx];
+    bullet.hidden = !bullet.hidden;
+  }
+  render();
+  saveData();
+};
 
 window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
   if (type === "section") {
@@ -288,10 +354,11 @@ window.openModal = function (type, secIdx, entryIdx, bulletIdx) {
       </div>
     `;
   } else if (type === "bullet") {
-    const bullet =
+    // Access the text property of the bullet object
+    const bulletObj =
       resumeData.sections[secIdx].entries[entryIdx].bullets[bulletIdx];
     titleEl.textContent = "Edit Bullet";
-    fieldsEl.innerHTML = `<div class="form-group"><label>Details</label><textarea id="input-text" rows="4">${bullet}</textarea></div>`;
+    fieldsEl.innerHTML = `<div class="form-group"><label>Details</label><textarea id="input-text" rows="4">${bulletObj.text}</textarea></div>`;
   } else if (type === "new-section") {
     titleEl.textContent = "Add Section";
     fieldsEl.innerHTML = `<div class="form-group"><label>Title</label><input type="text" id="input-title" placeholder="Experience, Education, etc."></div>`;
@@ -331,11 +398,12 @@ function saveModal() {
     resumeData.sections[secIdx].entries[entryIdx].stacked =
       document.getElementById("input-stacked").checked;
   } else if (type === "bullet")
-    resumeData.sections[secIdx].entries[entryIdx].bullets[bulletIdx] =
+    // Update .text of the bullet object
+    resumeData.sections[secIdx].entries[entryIdx].bullets[bulletIdx].text =
       document.getElementById("input-text").value;
   else if (type === "new-section") {
     const title = document.getElementById("input-title").value;
-    if (title) resumeData.sections.push({ title, entries: [] });
+    if (title) resumeData.sections.push({ title, hidden: false, entries: [] });
   } else if (type === "new-entry") {
     const title = document.getElementById("input-title").value;
     const meta = document.getElementById("input-meta").value;
@@ -345,11 +413,16 @@ function saveModal() {
         title,
         meta,
         stacked,
+        hidden: false,
         bullets: [],
       });
   } else if (type === "new-bullet") {
     const text = document.getElementById("input-text").value;
-    if (text) resumeData.sections[secIdx].entries[entryIdx].bullets.push(text);
+    if (text)
+      resumeData.sections[secIdx].entries[entryIdx].bullets.push({
+        text: text,
+        hidden: false,
+      });
   }
 
   closeModal();
@@ -426,6 +499,7 @@ function showToast(message) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  migrateData(); // Ensure migration runs on first load
   render();
 
   document
@@ -469,6 +543,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "Are you sure you want to clear all data? This cannot be undone.",
       () => {
         resumeData = JSON.parse(JSON.stringify(defaultState));
+        // Reset defaultState structure check just in case
+        migrateData();
         render();
         showToast("All data reset");
       }

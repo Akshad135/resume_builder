@@ -239,6 +239,7 @@ header p {
   position: relative;
   break-inside: avoid;
   page-break-inside: avoid;
+  transition: opacity 0.3s;
 }
 .resume-section h2 {
   font-size: 14pt;
@@ -259,9 +260,27 @@ header p {
   margin-left: -8px;
   break-inside: avoid;
   page-break-inside: avoid;
+  transition: opacity 0.3s;
 }
 .entry:hover {
   background: #f8fafc;
+}
+
+/* --- VISIBILITY TOGGLE STYLES --- */
+.is-hidden {
+  opacity: 0.4;
+  filter: grayscale(100%);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.03) 10px,
+    rgba(0, 0, 0, 0.03) 20px
+  );
+  border: 1px dashed #ccc;
+}
+.is-hidden:hover {
+  opacity: 0.8;
 }
 
 /* ENTRY HEADER LAYOUT & HOVER FIX */
@@ -311,6 +330,7 @@ header p {
   position: relative;
   padding: 2px 4px;
   border-radius: 4px;
+  transition: opacity 0.3s;
 }
 .entry-bullets li:hover {
   background: #eef2ff;
@@ -633,6 +653,11 @@ header:hover .action-btn-group,
   .action-btn,
   .action-btn-group,
   .control-group {
+    display: none !important;
+  }
+
+  /* HIDE ITEMS MARKED AS HIDDEN IN DATA */
+  .is-hidden {
     display: none !important;
   }
 
