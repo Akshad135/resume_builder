@@ -29,7 +29,44 @@ function render() {
   const preview = document.getElementById("resume-preview");
   preview.innerHTML = "";
 
-  // --- HEADER ---
+  // --- CREATE TABLE WRAPPER FOR PRINT LAYOUT ---
+  // This table ensures that the top margin (thead) repeats on every page
+  const table = document.createElement("table");
+  table.className = "resume-table";
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+
+  // 1. THEAD: Acts as the Top Margin on EVERY page
+  const thead = document.createElement("thead");
+  const trHead = document.createElement("tr");
+  const tdHead = document.createElement("td");
+  const headerSpacer = document.createElement("div");
+  headerSpacer.className = "print-header-space"; // CSS defined height
+  tdHead.appendChild(headerSpacer);
+  trHead.appendChild(tdHead);
+  thead.appendChild(trHead);
+  table.appendChild(thead);
+
+  // 2. TFOOT: Acts as the Bottom Margin on EVERY page
+  const tfoot = document.createElement("tfoot");
+  const trFoot = document.createElement("tr");
+  const tdFoot = document.createElement("td");
+  const footerSpacer = document.createElement("div");
+  footerSpacer.className = "print-footer-space"; // CSS defined height
+  tdFoot.appendChild(footerSpacer);
+  trFoot.appendChild(tdFoot);
+  tfoot.appendChild(trFoot);
+  table.appendChild(tfoot);
+
+  // 3. TBODY: The actual Resume Content
+  const tbody = document.createElement("tbody");
+  const trBody = document.createElement("tr");
+  const tdBody = document.createElement("td");
+  tdBody.className = "resume-content-cell";
+
+  // --- GENERATE RESUME CONTENT INTO TBODY ---
+
+  // Header
   const header = document.createElement("header");
   header.onclick = () => openModal("header");
   header.innerHTML = `
@@ -39,9 +76,9 @@ function render() {
       <button class="action-btn" title="Edit"><i class="ph ph-pencil-simple"></i></button>
     </div>
   `;
-  preview.appendChild(header);
+  tdBody.appendChild(header);
 
-  // --- SECTIONS ---
+  // Sections
   resumeData.sections.forEach((section, secIdx) => {
     const sectionEl = document.createElement("div");
     sectionEl.className = "resume-section";
@@ -70,19 +107,15 @@ function render() {
     `;
     sectionEl.appendChild(h2);
 
-    // --- ENTRIES ---
     section.entries.forEach((entry, entryIdx) => {
       const entryEl = document.createElement("div");
       entryEl.className = "entry";
 
       const isFirstEntry = entryIdx === 0;
       const isLastEntry = entryIdx === section.entries.length - 1;
-
-      // Check layout preference
       const isStacked = entry.stacked === true;
 
       const entryHeader = document.createElement("div");
-      // Add 'stacked' class if true
       entryHeader.className = `entry-header ${isStacked ? "stacked" : ""}`;
 
       entryHeader.innerHTML = `
@@ -107,7 +140,6 @@ function render() {
       `;
       entryEl.appendChild(entryHeader);
 
-      // --- BULLETS ---
       if (entry.bullets.length > 0) {
         const ul = document.createElement("ul");
         ul.className = "entry-bullets";
@@ -140,13 +172,17 @@ function render() {
       sectionEl.appendChild(entryEl);
     });
 
-    preview.appendChild(sectionEl);
+    tdBody.appendChild(sectionEl);
   });
 
+  trBody.appendChild(tdBody);
+  tbody.appendChild(trBody);
+  table.appendChild(tbody);
+
+  preview.appendChild(table);
   saveData();
 }
 
-// ... (Import/Export Logic remains same) ...
 function exportJSON() {
   const dataStr = JSON.stringify(resumeData, null, 2);
   const dataUri =
@@ -185,7 +221,6 @@ function handleFileImport(event) {
   reader.readAsText(file);
 }
 
-// ... (Reordering Logic remains same) ...
 window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
   if (type === "section") {
     const newIdx = secIdx + direction;
@@ -238,7 +273,6 @@ window.openModal = function (type, secIdx, entryIdx, bulletIdx) {
   } else if (type === "entry") {
     const entry = resumeData.sections[secIdx].entries[entryIdx];
     titleEl.textContent = "Edit Job/Degree";
-    // ADDED CHECKBOX FOR STACKED LAYOUT
     fieldsEl.innerHTML = `
       <div class="form-group"><label>Role / Degree</label><input type="text" id="input-title" value="${
         entry.title
@@ -294,7 +328,6 @@ function saveModal() {
       document.getElementById("input-title").value;
     resumeData.sections[secIdx].entries[entryIdx].meta =
       document.getElementById("input-meta").value;
-    // SAVE STACKED PREFERENCE
     resumeData.sections[secIdx].entries[entryIdx].stacked =
       document.getElementById("input-stacked").checked;
   } else if (type === "bullet")

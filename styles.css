@@ -9,6 +9,7 @@
   --danger: #ef4444;
   --danger-hover: #dc2626;
   --success: #10b981;
+  --page-guide-color: #9ca3af;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -181,9 +182,30 @@ body {
   background: white;
   width: 100%;
   min-height: 297mm;
-  padding: 20mm;
+  padding: 0 20mm;
   box-shadow: var(--shadow-lg);
   position: relative;
+
+  /* --- PAGE BREAK VISUAL GUIDE --- */
+  background-image: radial-gradient(
+    circle at center bottom,
+    var(--page-guide-color) 2px,
+    transparent 2.5px
+  );
+  background-size: 14px 297mm;
+  background-position: center -53mm;
+  background-repeat: repeat;
+}
+
+/* --- TABLE LAYOUT SPACERS --- */
+.resume-table {
+  width: 100%;
+}
+.print-header-space {
+  height: 1.5cm;
+}
+.print-footer-space {
+  height: 1.5cm;
 }
 
 /* --- RESUME TYPOGRAPHY --- */
@@ -215,6 +237,8 @@ header p {
 .resume-section {
   margin-bottom: 24px;
   position: relative;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .resume-section h2 {
   font-size: 14pt;
@@ -233,6 +257,8 @@ header p {
   padding: 4px 8px;
   border-radius: 4px;
   margin-left: -8px;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .entry:hover {
   background: #f8fafc;
@@ -242,10 +268,10 @@ header p {
 .entry-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline; /* Ensures Title & Date sit on same line */
+  align-items: baseline;
   margin-bottom: 4px;
   gap: 16px;
-  position: relative; /* Anchor for the pill */
+  position: relative;
 }
 
 /* Stacked mode */
@@ -308,29 +334,10 @@ header p {
   z-index: 100;
 }
 
-/* --- HOVER LOGIC (FIXED) --- */
-/* 1. Header Hover */
-header:hover .action-btn-group {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* 2. Section Title Hover ONLY (Not the whole section div) */
-.resume-section h2:hover .action-btn-group {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* 3. Entry Title/Meta Hover ONLY (Not the whole entry div including bullets) */
-.entry-header:hover .action-btn-group {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* 4. Bullet Item Hover */
+/* --- HOVER LOGIC --- */
+header:hover .action-btn-group,
+.resume-section h2:hover .action-btn-group,
+.entry-header:hover .action-btn-group,
 .entry-bullets li:hover .action-btn-group {
   opacity: 1;
   transform: translateY(0);
@@ -392,7 +399,6 @@ header:hover .action-btn-group {
   animation: scaleUp 0.2s forwards;
 }
 
-/* Small Modal for Confirmation */
 .modal.modal-sm {
   max-width: 350px;
 }
@@ -462,7 +468,7 @@ header:hover .action-btn-group {
   gap: 12px;
 }
 
-/* Keyframes */
+/* Keyframes & Toasts */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -480,7 +486,6 @@ header:hover .action-btn-group {
   }
 }
 
-/* Helpers */
 .markdown-callout {
   background: #eff6ff;
   border: 1px solid #bfdbfe;
@@ -507,7 +512,6 @@ header:hover .action-btn-group {
   font-family: monospace;
 }
 
-/* Toasters */
 #toast-container {
   position: fixed;
   top: 24px;
@@ -518,7 +522,6 @@ header:hover .action-btn-group {
   z-index: 9999;
   pointer-events: none;
 }
-
 .toast {
   background: white;
   color: var(--text-main);
@@ -535,12 +538,10 @@ header:hover .action-btn-group {
   pointer-events: auto;
   min-width: 250px;
 }
-
 .toast i {
   color: var(--success);
   font-size: 1.2rem;
 }
-
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -597,26 +598,50 @@ header:hover .action-btn-group {
   @page {
     margin: 0;
   }
+
+  /* RESET OVERFLOW */
+  html,
   body {
+    height: auto !important;
+    overflow: visible !important;
     background: white;
+    margin: 0 !important;
   }
+
+  .preview {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .container {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* --- HIDE ALL UI ELEMENTS --- */
   .sidebar,
   .modal-overlay,
+  .sidebar-toggle,
+  button,
+  input,
+  textarea,
+  select,
+  .action-btn,
   .action-btn-group,
-  .sidebar-toggle {
+  .control-group {
     display: none !important;
   }
-  .preview {
-    padding: 0;
-    margin: 0;
-    height: auto;
-    display: block;
-  }
+
   #resume-preview {
-    width: 100%;
-    padding: 1.5cm 2cm;
-    box-shadow: none;
-    min-height: auto;
+    width: 100% !important;
+    min-height: auto !important;
+    padding: 0 2cm !important;
+    box-shadow: none !important;
+    background: none !important;
   }
 
   /* --- LINK FIX --- */
