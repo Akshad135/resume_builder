@@ -10,6 +10,7 @@ const defaultState = {
         {
           title: "Senior Software Engineer",
           meta: "Google | 2020 - Present",
+          stacked: false, // Default to inline
           bullets: [
             "Led the **frontend overhaul** using React",
             "Improved performance by 40%",
@@ -45,7 +46,6 @@ function render() {
     const sectionEl = document.createElement("div");
     sectionEl.className = "resume-section";
 
-    // Helpers for Section Reordering
     const isFirstSec = secIdx === 0;
     const isLastSec = secIdx === resumeData.sections.length - 1;
 
@@ -75,17 +75,20 @@ function render() {
       const entryEl = document.createElement("div");
       entryEl.className = "entry";
 
-      // Helpers for Entry Reordering
       const isFirstEntry = entryIdx === 0;
       const isLastEntry = entryIdx === section.entries.length - 1;
 
+      // Check layout preference
+      const isStacked = entry.stacked === true;
+
       const entryHeader = document.createElement("div");
-      entryHeader.className = "entry-header";
+      // Add 'stacked' class if true
+      entryHeader.className = `entry-header ${isStacked ? "stacked" : ""}`;
+
       entryHeader.innerHTML = `
-        <div>
-            <div class="entry-title">${parseMarkdown(entry.title)}</div>
-            <div class="entry-meta">${parseMarkdown(entry.meta)}</div>
-        </div>
+        <div class="entry-title">${parseMarkdown(entry.title)}</div>
+        <div class="entry-meta">${parseMarkdown(entry.meta)}</div>
+        
         <div class="action-btn-group">
           ${
             !isFirstEntry
@@ -109,7 +112,6 @@ function render() {
         const ul = document.createElement("ul");
         ul.className = "entry-bullets";
         entry.bullets.forEach((bullet, bulletIdx) => {
-          // Helpers for Bullet Reordering
           const isFirstBullet = bulletIdx === 0;
           const isLastBullet = bulletIdx === entry.bullets.length - 1;
 
@@ -144,15 +146,12 @@ function render() {
   saveData();
 }
 
-// --- IMPORT / EXPORT LOGIC ---
-
+// ... (Import/Export Logic remains same) ...
 function exportJSON() {
   const dataStr = JSON.stringify(resumeData, null, 2);
   const dataUri =
     "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-
   const exportFileDefaultName = "my-resume.json";
-
   const linkElement = document.createElement("a");
   linkElement.setAttribute("href", dataUri);
   linkElement.setAttribute("download", exportFileDefaultName);
@@ -167,23 +166,17 @@ function triggerImport() {
 function handleFileImport(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function (e) {
     try {
       const importedData = JSON.parse(e.target.result);
-
-      // Basic validation
       if (!importedData.header || !importedData.sections) {
         throw new Error("Invalid resume JSON format");
       }
-
       resumeData = importedData;
       saveData();
       render();
       showToast("Resume imported successfully");
-
-      // Clear input so same file can be selected again if needed
       event.target.value = "";
     } catch (err) {
       alert("Error parsing JSON: " + err.message);
@@ -192,14 +185,11 @@ function handleFileImport(event) {
   reader.readAsText(file);
 }
 
-// --- REORDERING LOGIC ---
+// ... (Reordering Logic remains same) ...
 window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
-  // direction: -1 for UP, 1 for DOWN
-
   if (type === "section") {
     const newIdx = secIdx + direction;
     if (newIdx >= 0 && newIdx < resumeData.sections.length) {
-      // Swap sections
       [resumeData.sections[secIdx], resumeData.sections[newIdx]] = [
         resumeData.sections[newIdx],
         resumeData.sections[secIdx],
@@ -209,7 +199,6 @@ window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
     const entries = resumeData.sections[secIdx].entries;
     const newIdx = entryIdx + direction;
     if (newIdx >= 0 && newIdx < entries.length) {
-      // Swap entries
       [entries[entryIdx], entries[newIdx]] = [
         entries[newIdx],
         entries[entryIdx],
@@ -219,14 +208,12 @@ window.moveItem = function (type, direction, secIdx, entryIdx, bulletIdx) {
     const bullets = resumeData.sections[secIdx].entries[entryIdx].bullets;
     const newIdx = bulletIdx + direction;
     if (newIdx >= 0 && newIdx < bullets.length) {
-      // Swap bullets
       [bullets[bulletIdx], bullets[newIdx]] = [
         bullets[newIdx],
         bullets[bulletIdx],
       ];
     }
   }
-
   render();
   saveData();
 };
@@ -251,9 +238,20 @@ window.openModal = function (type, secIdx, entryIdx, bulletIdx) {
   } else if (type === "entry") {
     const entry = resumeData.sections[secIdx].entries[entryIdx];
     titleEl.textContent = "Edit Job/Degree";
+    // ADDED CHECKBOX FOR STACKED LAYOUT
     fieldsEl.innerHTML = `
-      <div class="form-group"><label>Role / Degree</label><input type="text" id="input-title" value="${entry.title}"></div>
-      <div class="form-group"><label>Company / Date</label><input type="text" id="input-meta" value="${entry.meta}"></div>
+      <div class="form-group"><label>Role / Degree</label><input type="text" id="input-title" value="${
+        entry.title
+      }"></div>
+      <div class="form-group"><label>Company / Date</label><input type="text" id="input-meta" value="${
+        entry.meta
+      }"></div>
+      <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="input-stacked" style="width:auto;" ${
+          entry.stacked ? "checked" : ""
+        }>
+        <label for="input-stacked" style="margin:0; font-weight:normal;">Show Date below Title? (Stacked)</label>
+      </div>
     `;
   } else if (type === "bullet") {
     const bullet =
@@ -268,6 +266,10 @@ window.openModal = function (type, secIdx, entryIdx, bulletIdx) {
     fieldsEl.innerHTML = `
       <div class="form-group"><label>Role / Degree</label><input type="text" id="input-title" placeholder="Software Engineer"></div>
       <div class="form-group"><label>Company / Date</label><input type="text" id="input-meta" placeholder="Google | 2023 - Present"></div>
+      <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="input-stacked" style="width:auto;">
+        <label for="input-stacked" style="margin:0; font-weight:normal;">Show Date below Title? (Stacked)</label>
+      </div>
     `;
   } else if (type === "new-bullet") {
     titleEl.textContent = "Add Bullet";
@@ -292,6 +294,9 @@ function saveModal() {
       document.getElementById("input-title").value;
     resumeData.sections[secIdx].entries[entryIdx].meta =
       document.getElementById("input-meta").value;
+    // SAVE STACKED PREFERENCE
+    resumeData.sections[secIdx].entries[entryIdx].stacked =
+      document.getElementById("input-stacked").checked;
   } else if (type === "bullet")
     resumeData.sections[secIdx].entries[entryIdx].bullets[bulletIdx] =
       document.getElementById("input-text").value;
@@ -301,8 +306,14 @@ function saveModal() {
   } else if (type === "new-entry") {
     const title = document.getElementById("input-title").value;
     const meta = document.getElementById("input-meta").value;
+    const stacked = document.getElementById("input-stacked").checked;
     if (title)
-      resumeData.sections[secIdx].entries.push({ title, meta, bullets: [] });
+      resumeData.sections[secIdx].entries.push({
+        title,
+        meta,
+        stacked,
+        bullets: [],
+      });
   } else if (type === "new-bullet") {
     const text = document.getElementById("input-text").value;
     if (text) resumeData.sections[secIdx].entries[entryIdx].bullets.push(text);
@@ -359,14 +370,13 @@ function saveData() {
 
 function parseMarkdown(text) {
   if (!text) return "";
-  let updatedText = text.replace(
-    /\[(.*?)\]\((.*?)\)/g,
-    (match, linkText, url) => {
+  let updatedText = text
+    .replace(/\n/g, "<br>")
+    .replace(/\[(.*?)\]\((.*?)\)/g, (match, linkText, url) => {
       let finalUrl = url.trim();
       if (!/^https?:\/\//i.test(finalUrl)) finalUrl = "https://" + finalUrl;
       return `<a href="${finalUrl}" target="_blank" style="color:inherit; text-decoration:underline;">${linkText}</a>`;
-    }
-  );
+    });
   return updatedText
     .replace(/~~(.*?)~~/g, "<s>$1</s>")
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
@@ -413,7 +423,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("Progress saved");
   });
 
-  // Export / Import Listeners
   document.getElementById("export-btn").addEventListener("click", exportJSON);
   document
     .getElementById("import-btn")

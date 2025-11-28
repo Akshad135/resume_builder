@@ -238,21 +238,40 @@ header p {
   background: #f8fafc;
 }
 
+/* ENTRY HEADER LAYOUT & HOVER FIX */
 .entry-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: baseline; /* Ensures Title & Date sit on same line */
   margin-bottom: 4px;
+  gap: 16px;
+  position: relative; /* Anchor for the pill */
 }
+
+/* Stacked mode */
+.entry-header.stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
 .entry-title {
   font-weight: 700;
   font-size: 11pt;
   color: #000;
+  line-height: 1.2;
 }
+
 .entry-meta {
   font-size: 10pt;
   color: #555;
   font-style: italic;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.entry-header.stacked .entry-meta {
+  text-align: left;
 }
 
 .entry-bullets {
@@ -289,10 +308,29 @@ header p {
   z-index: 100;
 }
 
-/* Show on hover */
-header:hover .action-btn-group,
-.resume-section h2:hover .action-btn-group,
-.entry:hover > .entry-header .action-btn-group,
+/* --- HOVER LOGIC (FIXED) --- */
+/* 1. Header Hover */
+header:hover .action-btn-group {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 2. Section Title Hover ONLY (Not the whole section div) */
+.resume-section h2:hover .action-btn-group {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 3. Entry Title/Meta Hover ONLY (Not the whole entry div including bullets) */
+.entry-header:hover .action-btn-group {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 4. Bullet Item Hover */
 .entry-bullets li:hover .action-btn-group {
   opacity: 1;
   transform: translateY(0);
@@ -579,5 +617,15 @@ header:hover .action-btn-group,
     padding: 1.5cm 2cm;
     box-shadow: none;
     min-height: auto;
+  }
+
+  /* --- LINK FIX --- */
+  a {
+    text-decoration: underline !important;
+    color: black !important;
+    pointer-events: auto !important;
+  }
+  a[href]:after {
+    content: none !important;
   }
 }
