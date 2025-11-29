@@ -194,6 +194,67 @@
       </div>
     </div>
 
+    <!-- PRINT INSTRUCTIONS MODAL (NEW) -->
+    <div id="print-guide-modal" class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3><i class="ph ph-printer"></i> Important: Saving as PDF</h3>
+          <button class="close-modal" id="print-guide-close-x">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div
+            style="
+              background: #f3f4f6;
+              border-radius: 8px;
+              overflow: hidden;
+              margin-bottom: 16px;
+              /* Added border and shadow to make the screenshot pop */
+              border: 1px solid #cbd5e1;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <img
+              src="image.png"
+              alt="Select Save as PDF"
+              style="width: 100%; height: auto; display: block"
+            />
+          </div>
+          <p style="color: #4b5563; line-height: 1.6; margin-bottom: 12px">
+            To ensure your <strong>links remain clickable</strong>, please
+            select
+            <strong style="color: var(--primary)">"Save as PDF"</strong> in the
+            printer destination dropdown.
+          </p>
+          <p
+            style="
+              font-size: 0.9em;
+              color: #ef4444;
+              background: #fef2f2;
+              padding: 8px;
+              border-radius: 6px;
+              border: 1px solid #fecaca;
+            "
+          >
+            <i class="ph ph-warning"></i> Do not select "Microsoft Print to PDF"
+            or "CutePDF", as these will break your links.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-text" id="print-guide-cancel">Cancel</button>
+          <button class="btn btn-primary" id="print-guide-proceed">
+            Got it, Print
+          </button>
+        </div>
+      </div>
+    </div>
+
     <button id="sidebar-toggle" class="sidebar-toggle">
       <i class="ph ph-list"></i>
     </button>

@@ -612,12 +612,36 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   });
 
+  // --- UPDATED DOWNLOAD LOGIC ---
+  const printModal = document.getElementById("print-guide-modal");
+  const closePrintModal = () => printModal.classList.remove("active");
+
+  // 1. Show modal instead of printing directly
   document.getElementById("download-btn").addEventListener("click", () => {
-    const originalTitle = document.title;
-    document.title = "Resume";
-    window.print();
-    document.title = originalTitle;
+    printModal.classList.add("active");
   });
+
+  // 2. Handle "Got it, Print" button
+  document
+    .getElementById("print-guide-proceed")
+    .addEventListener("click", () => {
+      closePrintModal();
+      // Delay printing slightly to allow modal to fade out
+      setTimeout(() => {
+        const originalTitle = document.title;
+        document.title = "Resume";
+        window.print();
+        document.title = originalTitle;
+      }, 300);
+    });
+
+  // 3. Handle Cancel/Close
+  document
+    .getElementById("print-guide-cancel")
+    .addEventListener("click", closePrintModal);
+  document
+    .getElementById("print-guide-close-x")
+    .addEventListener("click", closePrintModal);
 
   const toggle = document.getElementById("sidebar-toggle");
   const sidebar = document.querySelector(".sidebar");
