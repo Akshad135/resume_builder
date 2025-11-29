@@ -24,6 +24,10 @@ const defaultState = {
               hidden: false,
             },
             { text: "Improved performance by 40%", hidden: false },
+            {
+              text: "[here's the link to my website](https://akshad135.github.io/website/)",
+              hidden: false,
+            },
           ],
         },
       ],
